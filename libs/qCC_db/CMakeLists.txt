@@ -26,7 +26,10 @@ file(GLOB QCC_DB_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 
-InstallSharedLibrary( TARGET CCCoreLib )
+InstallSharedLibrary( 
+    TARGET CCCoreLib
+    EXPORT
+)
 InstallSharedLibrary(
     TARGET ${PROJECT_NAME}
     EXPORT
