@@ -30,4 +30,13 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
 	CXX_VISIBILITY_PRESET hidden
 )
 
-InstallSharedLibrary( TARGET ${PROJECT_NAME} )
+file(GLOB CCPLUGINAPI_PUBLIC_HEADERS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+)
+
+InstallSharedLibrary(
+    TARGET ${PROJECT_NAME}
+    EXPORT
+    HEADERS ${CCPLUGINAPI_PUBLIC_HEADERS}
+    HEADERS_DEST "CCPluginAPI"
+)

@@ -14,4 +14,13 @@ target_link_libraries( ${PROJECT_NAME}
 
 target_include_directories( ${PROJECT_NAME} PUBLIC include)
 
-InstallSharedLibrary( TARGET ${PROJECT_NAME} )
+file(GLOB CCFBO_PUBLIC_HEADERS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+)
+
+InstallSharedLibrary(
+    TARGET ${PROJECT_NAME}
+    EXPORT
+    HEADERS ${CCFBO_PUBLIC_HEADERS}
+    HEADERS_DEST "CCFbo"
+)

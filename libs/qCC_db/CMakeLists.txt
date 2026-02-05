@@ -21,7 +21,17 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
 	CXX_VISIBILITY_PRESET hidden
 )
 
+file(GLOB QCC_DB_PUBLIC_HEADERS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+)
+
 InstallSharedLibrary( TARGET CCCoreLib )
-InstallSharedLibrary( TARGET ${PROJECT_NAME} )
+InstallSharedLibrary(
+    TARGET ${PROJECT_NAME}
+    EXPORT
+    HEADERS ${QCC_DB_PUBLIC_HEADERS}
+    HEADERS_DEST "qCC_db"
+)
 
 include( cmake/InstallCGALDependencies.cmake )

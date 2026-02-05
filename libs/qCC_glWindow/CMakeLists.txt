@@ -15,4 +15,13 @@ target_link_libraries( ${PROJECT_NAME}
         CC_FBO_LIB
 )
 
-InstallSharedLibrary( TARGET ${PROJECT_NAME} )
+file(GLOB QCC_GL_PUBLIC_HEADERS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+)
+
+InstallSharedLibrary(
+    TARGET ${PROJECT_NAME}
+    EXPORT
+    HEADERS ${QCC_GL_PUBLIC_HEADERS}
+    HEADERS_DEST "qCC_glWindow"
+)

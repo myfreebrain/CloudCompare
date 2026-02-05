@@ -126,3 +126,12 @@ add_custom_target(
 	COMMAND $<IF:$<BOOL:${CLANG_FORMAT}>,${CLANG_FORMAT},clang-format> --version
 	COMMAND $<IF:$<BOOL:${CLANG_FORMAT}>,${CLANG_FORMAT},clang-format> --Werror --dry-run "--files=${SOURCES_LIST_FILE}"
 )
+
+# 设置CloudCompare版本
+set(CLOUDCOMPARE_VERSION "2.14.0")
+
+# 生成并安装CMake包配置文件
+CloudCompareInstallPackageConfig(
+    VERSION ${CLOUDCOMPARE_VERSION}
+    COMPATIBILITY SameMajorVersion
+)

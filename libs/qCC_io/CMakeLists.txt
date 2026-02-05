@@ -45,4 +45,13 @@ if ( BUILD_TESTING )
 	add_subdirectory( test )
 endif()
 
-InstallSharedLibrary( TARGET ${PROJECT_NAME} )
+file(GLOB QCC_IO_PUBLIC_HEADERS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+)
+
+InstallSharedLibrary(
+    TARGET ${PROJECT_NAME}
+    EXPORT
+    HEADERS ${QCC_IO_PUBLIC_HEADERS}
+    HEADERS_DEST "qCC_io"
+)
