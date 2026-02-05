@@ -59,14 +59,12 @@ function(InstallSharedLibrary)
     message(STATUS "Install shared library: ${shared_lib_target}")
 
     # Add to export targets list if EXPORT is specified
+    # Note: Actual export is handled by CloudCompareInstallPackageConfig()
     if(INSTALL_SHARED_LIB_EXPORT AND CLOUDCOMPARE_INSTALL_CMAKE_CONFIG)
         set(CLOUDCOMPARE_EXPORT_TARGETS 
             ${CLOUDCOMPARE_EXPORT_TARGETS} ${shared_lib_target} 
             CACHE INTERNAL "List of CloudCompare export targets")
         message(STATUS "  -> Added to CloudCompareTargets export")
-        set(_pass_export "EXPORT")
-    else()
-        set(_pass_export "")
     endif()
 
     foreach(destination ${INSTALL_DESTINATIONS})
@@ -77,7 +75,6 @@ function(InstallSharedLibrary)
         _InstallSharedTarget(
             TARGET ${shared_lib_target}
             DEST_PATH ${destination}
-            ${_pass_export}
         )
     endforeach()
 
@@ -411,38 +408,23 @@ function(CloudCompareInstallPackageConfig)
         message(STATUS "  Export targets: ${CLOUDCOMPARE_EXPORT_TARGETS}")
         
         # Install all tracked targets to the export set
-        # This ensures the export set is created regardless of how individual libraries were installed
+        # We handle ALL exports here to ensure consistency
         foreach(_target ${CLOUDCOMPARE_EXPORT_TARGETS})
             if(TARGET ${_target})
-                # Get target type to determine appropriate install destinations
-                get_target_property(_target_type ${_target} TYPE)
-                
-                if(_target_type STREQUAL "SHARED_LIBRARY" OR _target_type STREQUAL "STATIC_LIBRARY")
-                    # Check if target was already added to this export set
-                    get_property(_already_exported TARGET ${_target} PROPERTY CLOUDCOMPARE_EXPORTED)
-                    
-                    if(NOT _already_exported)
-                        install(
-                            TARGETS ${_target}
-                            EXPORT CloudCompareTargets
-                            LIBRARY DESTINATION "${CLOUDCOMPARE_LIB_INSTALL_DIR}"
-                                COMPONENT Runtime
-                            ARCHIVE DESTINATION "${CLOUDCOMPARE_LIB_INSTALL_DIR}"
-                                COMPONENT Development
-                            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-                                COMPONENT Runtime
-                            INCLUDES DESTINATION "${CLOUDCOMPARE_INCLUDE_INSTALL_DIR}/${_target}"
-                        )
-                        set_property(TARGET ${_target} PROPERTY CLOUDCOMPARE_EXPORTED TRUE)
-                        message(STATUS "    -> Exported: ${_target}")
-                    else()
-                        message(STATUS "    -> Already exported: ${_target}")
-                    endif()
-                else()
-                    message(STATUS "    -> Skipping non-library target: ${_target} (${_target_type})")
-                endif()
+                message(STATUS "    -> Exporting: ${_target}")
+                install(
+                    TARGETS ${_target}
+                    EXPORT CloudCompareTargets
+                    LIBRARY DESTINATION "${CLOUDCOMPARE_LIB_INSTALL_DIR}"
+                        COMPONENT Runtime
+                    ARCHIVE DESTINATION "${CLOUDCOMPARE_LIB_INSTALL_DIR}"
+                        COMPONENT Development
+                    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+                        COMPONENT Runtime
+                    INCLUDES DESTINATION "${CLOUDCOMPARE_INCLUDE_INSTALL_DIR}/${_target}"
+                )
             else()
-                message(WARNING "  Target ${_target} not found, skipping export")
+                message(WARNING "    -> Target ${_target} not found, skipping")
             endif()
         endforeach()
         
@@ -480,10 +462,11 @@ endfunction()
 # =============================================================================
 
 # _InstallSharedTarget - Internal function to install shared library targets
+# Note: EXPORT is handled centrally by CloudCompareInstallPackageConfig()
 function(_InstallSharedTarget)
     cmake_parse_arguments(
         INSTALL_SHARED_TARGET
-        "EXPORT"
+        ""
         "DEST_FOLDER;DEST_PATH;TARGET"
         ""
         ${ARGN}
@@ -492,18 +475,6 @@ function(_InstallSharedTarget)
     # For readability
     set(shared_target "${INSTALL_SHARED_TARGET_TARGET}")
     set(full_path "${INSTALL_SHARED_TARGET_DEST_PATH}/${INSTALL_SHARED_TARGET_DEST_FOLDER}")
-    
-    # Determine if we should add to export set
-    # Check if CLOUDCOMPARE_INSTALL_CMAKE_CONFIG is defined, default to ON
-    if(NOT DEFINED CLOUDCOMPARE_INSTALL_CMAKE_CONFIG)
-        set(CLOUDCOMPARE_INSTALL_CMAKE_CONFIG ON)
-    endif()
-    
-    set(_do_export FALSE)
-    if(INSTALL_SHARED_TARGET_EXPORT AND CLOUDCOMPARE_INSTALL_CMAKE_CONFIG)
-        set(_do_export TRUE)
-        message(STATUS "  -> Will export target: ${shared_target}")
-    endif()
     
     # Before CMake 3.13, install(TARGETS) would only accept targets created in the same directory scope
     if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
@@ -519,68 +490,31 @@ function(_InstallSharedTarget)
         get_target_property(target_bin_dir ${shared_target} BINARY_DIR)
         set(target_shared_lib "${target_bin_dir}/${lib_prefix}${shared_target}${lib_postfix}${CMAKE_SHARED_LIBRARY_SUFFIX}")
         copy_files("${target_shared_lib}" "${full_path}" 1)
-        
-        # Note: Export not supported for CMake < 3.13
-        if(INSTALL_SHARED_TARGET_EXPORT)
-            message(WARNING "EXPORT not supported for CMake < 3.13. Target ${shared_target} will not be exported.")
-        endif()
     else()
         if(WIN32)
             if(NOT CMAKE_CONFIGURATION_TYPES)
                 # Single-config generator (Ninja, Makefiles)
-                if(_do_export)
-                    install(
-                        TARGETS ${shared_target}
-                        EXPORT CloudCompareTargets
-                        RUNTIME DESTINATION ${full_path}
-                            COMPONENT Runtime
-                        LIBRARY DESTINATION ${full_path}
-                            COMPONENT Runtime
-                        ARCHIVE DESTINATION ${full_path}
-                            COMPONENT Development
-                    )
-                    # Mark target as exported to avoid double-export
-                    set_property(TARGET ${shared_target} PROPERTY CLOUDCOMPARE_EXPORTED TRUE)
-                else()
-                    install(
-                        TARGETS ${shared_target}
-                        RUNTIME DESTINATION ${full_path}
-                            COMPONENT Runtime
-                        LIBRARY DESTINATION ${full_path}
-                            COMPONENT Runtime
-                        ARCHIVE DESTINATION ${full_path}
-                            COMPONENT Development
-                    )
-                endif()
+                install(
+                    TARGETS ${shared_target}
+                    RUNTIME DESTINATION ${full_path}
+                        COMPONENT Runtime
+                    LIBRARY DESTINATION ${full_path}
+                        COMPONENT Runtime
+                    ARCHIVE DESTINATION ${full_path}
+                        COMPONENT Development
+                )
             else()
                 # Multi-config generator (Visual Studio)
-                # Note: EXPORT can only be specified once per target, so we put it on Debug config
-                if(_do_export)
-                    install(
-                        TARGETS ${shared_target}
-                        EXPORT CloudCompareTargets
-                        CONFIGURATIONS Debug
-                        RUNTIME DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Runtime
-                        LIBRARY DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Runtime
-                        ARCHIVE DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Development
-                    )
-                    # Mark target as exported to avoid double-export
-                    set_property(TARGET ${shared_target} PROPERTY CLOUDCOMPARE_EXPORTED TRUE)
-                else()
-                    install(
-                        TARGETS ${shared_target}
-                        CONFIGURATIONS Debug
-                        RUNTIME DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Runtime
-                        LIBRARY DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Runtime
-                        ARCHIVE DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
-                            COMPONENT Development
-                    )
-                endif()
+                install(
+                    TARGETS ${shared_target}
+                    CONFIGURATIONS Debug
+                    RUNTIME DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
+                        COMPONENT Runtime
+                    LIBRARY DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
+                        COMPONENT Runtime
+                    ARCHIVE DESTINATION ${INSTALL_SHARED_TARGET_DEST_PATH}_debug/${INSTALL_SHARED_TARGET_DEST_FOLDER}
+                        COMPONENT Development
+                )
             
                 install(
                     TARGETS ${shared_target}
@@ -606,33 +540,16 @@ function(_InstallSharedTarget)
             endif()
         else()
             # Unix/Linux/macOS
-            if(_do_export)
-                install(
-                    TARGETS ${shared_target}
-                    EXPORT CloudCompareTargets
-                    LIBRARY DESTINATION ${full_path}
-                        COMPONENT Runtime
-                        NAMELINK_COMPONENT Development
-                    ARCHIVE DESTINATION ${full_path}
-                        COMPONENT Development
-                    RUNTIME DESTINATION ${full_path}
-                        COMPONENT Runtime
-                    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/cloudcompare/${shared_target}"
-                )
-                # Mark target as exported to avoid double-export
-                set_property(TARGET ${shared_target} PROPERTY CLOUDCOMPARE_EXPORTED TRUE)
-            else()
-                install(
-                    TARGETS ${shared_target}
-                    LIBRARY DESTINATION ${full_path}
-                        COMPONENT Runtime
-                        NAMELINK_COMPONENT Development
-                    ARCHIVE DESTINATION ${full_path}
-                        COMPONENT Development
-                    RUNTIME DESTINATION ${full_path}
-                        COMPONENT Runtime
-                )
-            endif()
+            install(
+                TARGETS ${shared_target}
+                LIBRARY DESTINATION ${full_path}
+                    COMPONENT Runtime
+                    NAMELINK_COMPONENT Development
+                ARCHIVE DESTINATION ${full_path}
+                    COMPONENT Development
+                RUNTIME DESTINATION ${full_path}
+                    COMPONENT Runtime
+            )
         endif()
     endif()
 endfunction()
