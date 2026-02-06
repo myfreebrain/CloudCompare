@@ -5,7 +5,12 @@ add_library( ${PROJECT_NAME} SHARED )
 add_subdirectory( include )
 add_subdirectory( src )
 
-add_subdirectory( extern/CCCoreLib EXCLUDE_FROM_ALL )
+if(USE_SYSTEM_CCCORELIB)
+	find_package(CCCoreLib REQUIRED)
+	set(CCCoreLib CCCoreLib::CCCoreLib)	
+else()
+	add_subdirectory( extern/CCCoreLib EXCLUDE_FROM_ALL )
+endif()
 
 target_link_libraries( ${PROJECT_NAME}
 	PUBLIC
@@ -22,14 +27,16 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
 )
 
 file(GLOB QCC_DB_PUBLIC_HEADERS 
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 
-InstallSharedLibrary( 
-    TARGET CCCoreLib
-    EXPORT
-)
+if(NOT USE_SYSTEM_CCCORELIB)
+	InstallSharedLibrary( 
+		TARGET CCCoreLib
+		EXPORT
+	)
+endif()
+
 InstallSharedLibrary(
     TARGET ${PROJECT_NAME}
     EXPORT

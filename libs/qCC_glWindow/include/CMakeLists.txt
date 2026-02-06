@@ -11,7 +11,12 @@ target_sources( ${PROJECT_NAME}
 		${CMAKE_CURRENT_LIST_DIR}/qCC_glWindow.h
 )
 
+#target_include_directories( ${PROJECT_NAME}
+#	PUBLIC
+#		${CMAKE_CURRENT_LIST_DIR}
+#)
 target_include_directories( ${PROJECT_NAME}
-	PUBLIC
-		${CMAKE_CURRENT_LIST_DIR}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cloudcompare/${PROJECT_NAME}>
 )

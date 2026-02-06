@@ -25,6 +25,9 @@ option(CLOUDCOMPARE_INSTALL_CMAKE_CONFIG
 option(CLOUDCOMPARE_REGISTER_PACKAGE 
     "Register CloudCompare package in CMake registry" OFF)
 
+option(CLOUDCOMPARE_SKIP_EXPORT 
+    "Skip exporting targets (use if source code lacks proper INSTALL_INTERFACE)" OFF)
+
 # Define the list of targets to be exported
 set(CLOUDCOMPARE_EXPORT_TARGETS "" CACHE INTERNAL "List of CloudCompare export targets")
 
@@ -404,7 +407,10 @@ function(CloudCompareInstallPackageConfig)
     )
 
     # Export targets for installation
-    if(CLOUDCOMPARE_EXPORT_TARGETS)
+    if(CLOUDCOMPARE_SKIP_EXPORT)
+        message(STATUS "  Export skipped (CLOUDCOMPARE_SKIP_EXPORT=ON)")
+        message(STATUS "  To enable export, apply patches to fix target_include_directories")
+    elseif(CLOUDCOMPARE_EXPORT_TARGETS)
         message(STATUS "  Export targets: ${CLOUDCOMPARE_EXPORT_TARGETS}")
         
         # Install all tracked targets to the export set

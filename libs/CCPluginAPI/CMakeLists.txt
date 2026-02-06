@@ -15,7 +15,14 @@ add_subdirectory( ui )
 # We only need the includes from the stub
 get_target_property( STUB_INCLUDES CCPluginStub INCLUDE_DIRECTORIES )
 
-target_include_directories( ${PROJECT_NAME} PUBLIC "${STUB_INCLUDES}" )
+#target_include_directories( ${PROJECT_NAME} PUBLIC "${STUB_INCLUDES}" )
+target_include_directories( ${PROJECT_NAME} 
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../CCPluginStub/include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cloudcompare/${PROJECT_NAME}>
+)
+
 
 target_link_libraries( ${PROJECT_NAME}
 	PUBLIC

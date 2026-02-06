@@ -17,7 +17,7 @@ include( CMakePolicies )
 include( CMakeSetCompilerOptions )
 include( DeployQt )
 
-#option(USE_SYSTEM_SHAPELIB            "Use system pre-installed shapelib"         ON)
+option(USE_SYSTEM_CCCORELIB            "Use system pre-installed CCCoreLib"         ON)
 
 # CCViewer
 option( OPTION_BUILD_CCVIEWER "Check to compile CCViewer project" ON )
