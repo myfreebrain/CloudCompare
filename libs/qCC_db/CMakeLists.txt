@@ -7,18 +7,24 @@ add_subdirectory( src )
 
 if(USE_SYSTEM_CCCORELIB)
 	find_package(CCCoreLib REQUIRED)
-	set(CCCoreLib CCCoreLib::CCCoreLib)	
+	#set(CCCoreLib CCCoreLib::CCCoreLib)	
+	target_link_libraries( ${PROJECT_NAME}
+		PUBLIC
+			CCCoreLib::CCCoreLib
+			Qt6::Widgets
+			Qt6::OpenGL
+			CC_FBO_LIB
+	)
 else()
 	add_subdirectory( extern/CCCoreLib EXCLUDE_FROM_ALL )
+	target_link_libraries( ${PROJECT_NAME}
+		PUBLIC
+    		CCCoreLib
+			Qt6::Widgets
+			Qt6::OpenGL
+			CC_FBO_LIB
+	)
 endif()
-
-target_link_libraries( ${PROJECT_NAME}
-	PUBLIC
-    	CCCoreLib
-		Qt6::Widgets
-		Qt6::OpenGL
-		CC_FBO_LIB
-)
 
 target_compile_definitions( ${PROJECT_NAME} PRIVATE QCC_DB_LIBRARY_BUILD QT_NO_KEYWORDS )
 
