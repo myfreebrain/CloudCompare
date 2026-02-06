@@ -11,6 +11,7 @@ if(USE_SYSTEM_CCCORELIB)
 	#set(CCCoreLib CCCoreLib::CCCoreLib)	
 	target_link_libraries( ${PROJECT_NAME}
 		PUBLIC
+			nanoflann::nanoflann
 			CCCoreLib::CCCoreLib
 			Qt6::Widgets
 			Qt6::OpenGL
