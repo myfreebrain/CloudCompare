@@ -6,6 +6,7 @@ add_subdirectory( include )
 add_subdirectory( src )
 
 if(USE_SYSTEM_CCCORELIB)
+	find_package(nanoflann REQUIRED)
 	find_package(CCCoreLib REQUIRED)
 	#set(CCCoreLib CCCoreLib::CCCoreLib)	
 	target_link_libraries( ${PROJECT_NAME}
