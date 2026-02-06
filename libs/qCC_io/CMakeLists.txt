@@ -19,7 +19,7 @@ option( OPTION_USE_SHAPE_LIB "Build with ShapeLib (SHP files support)" ON )
 if( ${OPTION_USE_SHAPE_LIB} )
 	set( SHAPELIB_LIB_DIR "extern/shapelib" CACHE PATH "shapelib lib path" )
 	add_subdirectory( "${SHAPELIB_LIB_DIR}" )
-	target_link_libraries( ${PROJECT_NAME} PUBLIC shapelib )
+	target_link_libraries( ${PROJECT_NAME} PRIVATE shapelib )
 	target_compile_definitions( ${PROJECT_NAME} PUBLIC CC_SHP_SUPPORT )
 endif()
 
