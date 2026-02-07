@@ -93,6 +93,10 @@ void PlyFilter::SetDefaultOutputFormat(e_ply_storage_mode format)
 
 CC_FILE_ERROR PlyFilter::saveToFile(ccHObject* entity, const QString& filename, const SaveParameters& parameters)
 {
+    if (parameters.isAscii)
+    {
+        s_defaultOutputFormat = PLY_ASCII;
+    }
 	e_ply_storage_mode outputFormat = s_defaultOutputFormat;
 
 	// ask for output format
@@ -1208,6 +1212,11 @@ CC_FILE_ERROR PlyFilter::loadFile(const QString& filename, const QString& inputT
 					yIndex = i;
 				else if (zIndex == 0 && propName.endsWith("Z"))
 					zIndex = i;
+				else if (!parameters.extraData.isEmpty() && parameters.extraData.exactMatch(propName))
+				{
+	                //CCTRACE("propName: " << propName.toStdString() << " extradata: " << parameters.extraData.pattern().toStdString());
+	                sfPropIndexes.push_back(i);
+				}
 			}
 			else if (propName.contains("SCAL") || propName.contains("VAL"))
 			{

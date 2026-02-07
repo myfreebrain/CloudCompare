@@ -72,6 +72,7 @@ class FileIOFilter
 		    , autoComputeNormals(false)
 		    , parentWidget(nullptr)
 		    , sessionStart(true)
+		    , extraData()
 		{
 		}
 
@@ -93,6 +94,8 @@ class FileIOFilter
 		QWidget* parentWidget;
 		//! Session start (whether the load action is the first of a session)
 		bool sessionStart;
+		//! regular expression to select extra fields (e.g. for .ply) from Python
+		QRegExp extraData;
 	};
 
 	//! Generic saving parameters
@@ -102,6 +105,9 @@ class FileIOFilter
 		SaveParameters()
 		    : alwaysDisplaySaveDialog(true)
 		    , parentWidget(nullptr)
+		    , minorVersion(-1)
+		    , pointFormat(-1)
+		    , isAscii(false)			
 		{
 		}
 
@@ -109,6 +115,9 @@ class FileIOFilter
 		bool alwaysDisplaySaveDialog;
 		//! Parent widget (if any)
 		QWidget* parentWidget;
+		int minorVersion; // for CloudComPyPython API, LAS plugin
+		int pointFormat;  // for CloudComPyPython API, LAS plugin
+		bool isAscii;     // for CloudComPyPython API, PLY plugin		
 	};
 
 	//! Shared type

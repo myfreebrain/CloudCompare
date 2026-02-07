@@ -911,6 +911,12 @@ CC_FILE_ERROR LasIOFilter::saveToFile(ccHObject* entity, const QString& filename
 				params.extraFields.push_back(field);
 			}
 		}
+        if (parameters.minorVersion >=0)
+            params.versionMinor = parameters.minorVersion;
+        if (parameters.pointFormat >=0)
+            params.pointFormat = parameters.pointFormat;
+        if ((parameters.minorVersion == 4) && (params.pointFormat == 0))
+            params.pointFormat = 6;
 	}
 
 	LasSaver      saver(*pointCloud, params);
