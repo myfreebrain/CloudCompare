@@ -26,7 +26,7 @@
 
 // Qt
 #include <QString>
-
+#include <QRegExp>
 // STL
 #include <vector>
 
