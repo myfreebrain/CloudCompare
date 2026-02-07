@@ -167,6 +167,7 @@ static CPLErr ContourWriter(double  dfLevel,
 			vertices->setEnabled(false);
 			poly = new ccPolyline(vertices);
 			poly->addChild(vertices);
+			poly->setMetaData(ccContourLinesGenerator::MetaKeySubIndex(), ++subIndex);
 			poly->setClosed(false);
 
 			// add the 'const altitude' meta-data as well
@@ -344,6 +345,7 @@ bool ccContourLinesGenerator::GenerateContourLines(ccRasterGrid*             ras
 					}
 
 					// add contour
+					poly->setName(QString("Contour line value = %1 (#%2)").arg(height).arg(poly->getMetaData(ccContourLinesGenerator::MetaKeySubIndex()).toUInt()));
 					contourLines.push_back(poly);
 				}
 			}
@@ -419,6 +421,7 @@ bool ccContourLinesGenerator::GenerateContourLines(ccRasterGrid*             ras
 				ccLog::PrintDebug(QString("[Rasterize][Isolines] value=%1 : %2 lines").arg(v).arg(lineCount));
 
 				// convert them to poylines
+				int realCount = 0;
 				for (int i = 0; i < lineCount; ++i)
 				{
 					int      vertCount    = iso.getContourLength(i);
@@ -479,6 +482,9 @@ bool ccContourLinesGenerator::GenerateContourLines(ccRasterGrid*             ras
 								{
 									poly->setClosed(isClosed); // if we have less vertices, it means we have 'chopped' the original contour
 									vertices->setEnabled(false);
+
+									++realCount;
+									poly->setMetaData(ccContourLinesGenerator::MetaKeySubIndex(), realCount);
 
 									// add the 'const altitude' meta-data as well
 									poly->setMetaData(ccPolyline::MetaKeyConstAltitude(), QVariant(v));
