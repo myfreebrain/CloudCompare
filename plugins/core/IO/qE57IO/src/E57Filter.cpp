@@ -1724,7 +1724,7 @@ static LoadedScan LoadScan(const e57::Node& node, QString& guidStr, ccProgressDi
 
 	if (!extraData.isEmpty() && !extraData.exactMatch(scanName))
 	{
-	    CCTRACE("Scan node " << scanName.toStdString() << " skipped, extraData filter: " << extraData.pattern().toStdString());
+	    //CCTRACE("Scan node " << scanName.toStdString() << " skipped, extraData filter: " << extraData.pattern().toStdString());
 	    return {};
 	}
 
