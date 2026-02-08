@@ -27,6 +27,7 @@ target_link_libraries( ${PROJECT_NAME}
 	PUBLIC
 		QCC_DB_LIB
 		Qt::Concurrent
+		Qt6::Core5Compat
 )
 
 if( OPTION_USE_GDAL )

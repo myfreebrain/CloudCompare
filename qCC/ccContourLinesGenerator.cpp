@@ -167,7 +167,7 @@ static CPLErr ContourWriter(double  dfLevel,
 			vertices->setEnabled(false);
 			poly = new ccPolyline(vertices);
 			poly->addChild(vertices);
-			poly->setMetaData(ccContourLinesGenerator::MetaKeySubIndex(), ++subIndex);
+			//poly->setMetaData(ccContourLinesGenerator::MetaKeySubIndex(), ++subIndex);
 			poly->setClosed(false);
 
 			// add the 'const altitude' meta-data as well

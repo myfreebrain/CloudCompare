@@ -54,6 +54,7 @@ target_link_libraries( ${PROJECT_NAME}
 		QCustomPlot
 		Qt6::PrintSupport
 		Qt6::Widgets
+		Qt6::Core5Compat
 		Qt6::OpenGLWidgets
 		Qt6::OpenGL
 )
