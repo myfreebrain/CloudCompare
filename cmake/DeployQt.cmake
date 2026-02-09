@@ -1,6 +1,7 @@
 find_package( Qt6
 	COMPONENTS
 		Core
+		Core5Compat
 	REQUIRED
 )
 
