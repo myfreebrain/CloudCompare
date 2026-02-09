@@ -345,7 +345,7 @@ bool ccContourLinesGenerator::GenerateContourLines(ccRasterGrid*             ras
 					}
 
 					// add contour
-					poly->setName(QString("Contour line value = %1 (#%2)").arg(height).arg(poly->getMetaData(ccContourLinesGenerator::MetaKeySubIndex()).toUInt()));
+					//poly->setName(QString("Contour line value = %1 (#%2)").arg(height).arg(poly->getMetaData(ccContourLinesGenerator::MetaKeySubIndex()).toUInt()));
 					contourLines.push_back(poly);
 				}
 			}
