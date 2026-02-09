@@ -1,5 +1,12 @@
 project( QCC_IO_LIB )
 
+find_package( Qt6
+	COMPONENTS
+		Core
+		Core5Compat
+	REQUIRED
+)
+
 add_library( ${PROJECT_NAME} SHARED )
 
 include( cmake/GDALSupport.cmake )
