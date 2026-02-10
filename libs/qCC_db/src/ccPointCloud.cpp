@@ -7190,3 +7190,41 @@ void ccPointCloud::Grid::updateMinAndMaxValidIndexes()
 		}
 	}
 }
+
+bool ccPointCloud::setVisibility(const ccPolyline* poly, unsigned char orthoDim, bool inside)
+{
+    if (orthoDim > 2)
+    {
+        ccLog::Warning("[ccGenericPointCloud::setVisibility] Invalid input orthoDim");
+        return false;
+    }
+
+    unsigned count = size();
+    if (count == 0)
+    {
+        ccLog::Warning("[ccGenericPointCloud::setVisibility] Cloud is empty!");
+        return false;
+    }
+
+    if (!resetVisibilityArray())
+    {
+        ccLog::Warning("[ccGenericPointCloud::setVisibility] not enough memory!");
+        return false;
+    }
+
+    unsigned char X = ((orthoDim+1) % 3);
+    unsigned char Y = ((X+1) % 3);
+
+    for (unsigned i=0; i<count; ++i)
+    {
+        const CCVector3* P = point(i);
+
+        CCVector2 P2D( P->u[X], P->u[Y] );
+        bool pointIsInside = CCCoreLib::ManualSegmentationTools::isPointInsidePoly(P2D, poly);
+        if (inside != pointIsInside)
+        {
+            m_pointsVisibility[i] = CCCoreLib::POINT_HIDDEN;
+        }
+    }
+    return true;
+}
