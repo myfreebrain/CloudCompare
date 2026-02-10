@@ -83,7 +83,7 @@ using CC_CLASS_ENUM = int64_t;
 //! CloudCompare object type flags
 namespace CC_TYPES
 {
-	enum : CC_CLASS_ENUM
+	enum CCTYPES : CC_CLASS_ENUM
 	{
 		OBJECT               = 0,
 		HIERARCHY_OBJECT     = CC_HIERARCH_BIT,

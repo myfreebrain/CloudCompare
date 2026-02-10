@@ -450,6 +450,8 @@ class QCC_DB_LIB_API ccMesh : public ccGenericMesh
 	//! Merges duplicated vertices
 	bool mergeDuplicatedVertices(unsigned char octreeLevel = DefaultMergeDuplicateVerticesLevel, QWidget* parentWidget = nullptr);
 
+	ccMesh* crop2D(const ccPolyline* poly, unsigned char orthoDim, bool inside = true);
+
 	//! Unrolls the mesh on a cylinder or a cone
 	/** This method relies heavily on the ccPointCloud::unroll method.
 	    \param mode unrolling mode
