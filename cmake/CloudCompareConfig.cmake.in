@@ -61,6 +61,8 @@ set(CloudCompare_QT_VERSION @QT_VERSION_MAJOR@)
 # Find required dependencies
 include(CMakeFindDependencyMacro)
 
+find_package(nanoflann REQUIRED)
+
 # Qt dependency
 if(CloudCompare_QT_VERSION EQUAL 6)
     find_dependency(Qt6 COMPONENTS Core Widgets OpenGL OpenGLWidgets Concurrent REQUIRED)
