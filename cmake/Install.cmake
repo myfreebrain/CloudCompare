@@ -427,7 +427,7 @@ function(CloudCompareInstallPackageConfig)
                         COMPONENT Development
                     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
                         COMPONENT Runtime
-                    INCLUDES DESTINATION "${CLOUDCOMPARE_INCLUDE_INSTALL_DIR}/${_target}"
+                    #INCLUDES DESTINATION "${CLOUDCOMPARE_INCLUDE_INSTALL_DIR}/${_target}"
                 )
             else()
                 message(WARNING "    -> Target ${_target} not found, skipping")
