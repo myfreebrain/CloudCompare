@@ -1372,7 +1372,11 @@ bool ccRasterizeTool::ExportGeoTiff(const QString&                    outputFile
 		return false;
 	}
 
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(3, 13, 0)
+	CSLConstList papszMetadata = poDriver->GetMetadata();
+#else
 	char** papszMetadata = poDriver->GetMetadata();
+#endif
 	if (!CSLFetchBoolean(papszMetadata, GDAL_DCAP_CREATE, FALSE))
 	{
 		ccLog::Error("[GDAL] Driver %s doesn't support Create() method", pszFormat);
@@ -1732,8 +1736,8 @@ void ccRasterizeTool::generateXRaySF()
 	// number of vertical steps
 	CCVector3 bbMin, bbMax;
 	m_cloud->getBoundingBox(bbMin, bbMax);
-	double   delaH      = bbMax.u[Z] - bbMin.u[Z];
-	unsigned layerCount = std::max(1u, static_cast<unsigned>(ceil(delaH / m_grid.gridStep)));
+	double   deltaH     = bbMax.u[Z] - bbMin.u[Z];
+	unsigned layerCount = std::max(1u, static_cast<unsigned>(ceil(deltaH / m_grid.gridStep)));
 	ccLog::Print("[Rasterize][X-ray] Number of vertical steps: " + QString::number(layerCount));
 
 	std::vector<bool> layerFilled;
